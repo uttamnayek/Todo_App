@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List - Todo App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/todos">Todo App</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <span class="nav-link">Welcome, <span th:text="${session.username}"></span></span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">Add New Todo</h3>
+            </div>
+            <div class="card-body">
+                <form action="/todos" method="post">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Todo</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">My Todo List</h3>
+            </div>
+            <div class="card-body">
+                <div th:if="${#lists.isEmpty(todos)}" class="alert alert-info">
+                    You don't have any todos yet. Add one above!
+                </div>
+                
+                <div th:unless="${#lists.isEmpty(todos)}" class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                                <th>Created At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="todo : ${todos}" th:class="${todo.completed ? 'table-success' : ''}">
+                                <td th:text="${todo.title}"></td>
+                                <td th:text="${todo.description}"></td>
+                                <td>
+                                    <span th:if="${todo.completed}" class="badge bg-success">Completed</span>
+                                    <span th:unless="${todo.completed}" class="badge bg-warning">Pending</span>
+                                </td>
+                                <td th:text="${#temporals.format(todo.createdAt, 'dd-MM-yyyy HH:mm')}"></td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a th:href="@{/todos/toggle/{id}(id=${todo.id})}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-check-circle"></i>
+                                        </a>
+                                        <a th:href="@{/todos/edit/{id}(id=${todo.id})}" class="btn btn-sm btn-outline-warning">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a th:href="@{/todos/delete/{id}(id=${todo.id})}" class="btn btn-sm btn-outline-danger" 
+                                           onclick="return confirm('Are you sure you want to delete this todo?')">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
